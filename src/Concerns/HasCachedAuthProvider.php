@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 
 trait HasCachedAuthProvider
 {
-    protected function initializeHasCachedAuthProvider(): void
+    protected static function bootHasCachedAuthProvider(): void
     {
         static::updated(function (Model $model) {
             CacheInvalidationRequested::dispatch($model, $model->getKey(), 'updated');
