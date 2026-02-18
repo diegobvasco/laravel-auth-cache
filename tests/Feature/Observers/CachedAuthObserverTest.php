@@ -14,7 +14,7 @@ it('clears cache when model is updated', function () {
 
     $user->update(['name' => 'Updated Name']);
 
-    Event::assertDispatchedOnce(CacheInvalidationRequested::class);
+    Event::assertDispatched(CacheInvalidationRequested::class, 1);
 });
 
 it('clears cache when model is deleted', function () {
@@ -26,5 +26,5 @@ it('clears cache when model is deleted', function () {
 
     $user->delete();
 
-    Event::assertDispatchedOnce(CacheInvalidationRequested::class);
+    Event::assertDispatched(CacheInvalidationRequested::class, 1);
 });
