@@ -111,7 +111,13 @@ class CachedEloquentUserProvider extends EloquentUserProvider
     {
         $store = $this->config['store'] ?? null;
 
-        return $store ? Cache::store($store) : Cache::store();
+        $cacheStore = $store ? Cache::store($store) : Cache::store();
+
+        if ($cacheStore === null) {
+            return Cache::store('array');
+        }
+
+        return $cacheStore;
     }
 
     protected function getCachePrefix(): string
