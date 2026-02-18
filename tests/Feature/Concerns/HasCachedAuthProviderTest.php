@@ -2,11 +2,8 @@
 
 declare(strict_types=1);
 
-use DiegoVasconcelos\AuthCache\Auth\CacheConfiguration;
-use DiegoVasconcelos\AuthCache\Auth\CacheKeyGenerator;
 use DiegoVasconcelos\AuthCache\Events\CacheInvalidationRequested;
 use DiegoVasconcelos\AuthCache\Tests\Fixtures\Models\UserWithTrait;
-use Illuminate\Support\Facades\Cache;
 
 it('clears cache when model is updated', function () {
     Event::fake([
