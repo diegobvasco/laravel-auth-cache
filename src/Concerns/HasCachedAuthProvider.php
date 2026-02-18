@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace DiegoVasconcelos\AuthCache\Concerns;
 
-use DiegoVasconcelos\AuthCache\Auth\CachedEloquentUserProvider;
+use DiegoVasconcelos\AuthCache\Events\CacheInvalidationRequested;
 use Illuminate\Database\Eloquent\Model;
 
 trait HasCachedAuthProvider
@@ -12,11 +12,11 @@ trait HasCachedAuthProvider
     protected function initializeHasCachedAuthProvider(): void
     {
         static::updated(function (Model $model) {
-            CachedEloquentUserProvider::removeCacheStatic($model, $model->getKey());
+            CacheInvalidationRequested::dispatch($model, $model->getKey(), 'updated');
         });
 
         static::deleted(function (Model $model) {
-            CachedEloquentUserProvider::removeCacheStatic($model, $model->getKey());
+            CacheInvalidationRequested::dispatch($model, $model->getKey(), 'deleted');
         });
     }
 }
