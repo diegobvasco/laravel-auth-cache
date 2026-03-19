@@ -71,7 +71,7 @@ it('creates dto using from factory method with null', function () {
 
 it('throws exception when creating dto from unsupported type', function () {
     CachedUserData::from(['array' => 'value']);
-})->throws(\InvalidArgumentException::class);
+})->throws(InvalidArgumentException::class);
 
 it('rehydrates model from dto correctly', function () {
     $user = User::factory()->create([

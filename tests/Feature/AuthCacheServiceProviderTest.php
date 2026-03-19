@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use DiegoVasconcelos\AuthCache\Auth\CachedEloquentUserProvider;
 use DiegoVasconcelos\AuthCache\AuthCacheServiceProvider;
 use DiegoVasconcelos\AuthCache\Tests\Fixtures\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -32,5 +33,5 @@ it('verify if auth provider is registered', function () {
 
     $provider = Auth::createUserProvider('cached_eloquent');
 
-    expect($provider)->toBeInstanceOf(\DiegoVasconcelos\AuthCache\Auth\CachedEloquentUserProvider::class);
+    expect($provider)->toBeInstanceOf(CachedEloquentUserProvider::class);
 });

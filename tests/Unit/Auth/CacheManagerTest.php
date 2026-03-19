@@ -30,7 +30,7 @@ it('caches value when enabled', function () {
     $cacheMock = Mockery::mock(Repository::class);
     $cacheMock->shouldReceive('remember')
         ->once()
-        ->with('test.key', \Mockery::type(\DateTimeInterface::class), \Mockery::type('callable'))
+        ->with('test.key', Mockery::type(DateTimeInterface::class), Mockery::type('callable'))
         ->andReturn('cached-value');
 
     $manager = new CacheManager(
