@@ -2,6 +2,14 @@
 
 All notable changes to `laravel-auth-cache` will be documented in this file.
 
+## V1.0.2 - 2026-03-19
+
+### What's Changed
+
+* Add support for Laravel 13 in composer.json and update test matrix by @diegobvasco in https://github.com/diegobvasco/laravel-auth-cache/pull/3
+
+**Full Changelog**: https://github.com/diegobvasco/laravel-auth-cache/compare/1.0.1...1.0.2
+
 ## 1.0.1 - 2026-02-18
 
 ### What's Changed
