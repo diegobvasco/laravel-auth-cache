@@ -8,7 +8,7 @@ use DiegoVasconcelos\AuthCache\Contracts\Cache\CacheConfigurationInterface;
 use DiegoVasconcelos\AuthCache\Contracts\Cache\CacheKeyGeneratorInterface;
 use DiegoVasconcelos\AuthCache\ValueObjects\CacheKey;
 
-class CacheKeyGenerator implements CacheKeyGeneratorInterface
+readonly class CacheKeyGenerator implements CacheKeyGeneratorInterface
 {
     public function __construct(
         private CacheConfigurationInterface $configuration
