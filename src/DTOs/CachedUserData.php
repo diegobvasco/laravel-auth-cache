@@ -85,6 +85,38 @@ readonly class CachedUserData
         );
     }
 
+    /**
+     * Reconstruct the DTO from its plain array representation.
+     *
+     * Storing the cached data as a plain array of primitives guarantees that
+     * the value can always be unserialized, regardless of the host
+     * application's `cache.serializable_classes` security configuration.
+     */
+    public static function fromArray(array $data): self
+    {
+        return new self(
+            type: $data['type'],
+            modelClass: $data['modelClass'] ?? null,
+            attributes: $data['attributes'] ?? null,
+            value: $data['value'] ?? null,
+            exists: $data['exists'] ?? false,
+        );
+    }
+
+    /**
+     * Convert the DTO to a plain array of primitives safe to cache.
+     */
+    public function toArray(): array
+    {
+        return [
+            'type' => $this->type,
+            'modelClass' => $this->modelClass,
+            'attributes' => $this->attributes,
+            'value' => $this->value,
+            'exists' => $this->exists,
+        ];
+    }
+
     public function toAuthenticatable(): string|(Model&Authenticatable)|null
     {
         return match ($this->type) {

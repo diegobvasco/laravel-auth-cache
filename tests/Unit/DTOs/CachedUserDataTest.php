@@ -132,3 +132,51 @@ it('preserves model attributes after roundtrip', function () {
 
     expect($rehydrated->getAttributes())->toBe($originalAttributes);
 });
+
+it('converts to a plain array of primitives', function () {
+    $user = User::factory()->create([
+        'name' => 'Array User',
+        'email' => 'array@example.com',
+    ]);
+
+    $dto = CachedUserData::fromModel($user);
+    $array = $dto->toArray();
+
+    expect($array)->toBeArray();
+    expect($array['type'])->toBe('model');
+    expect($array['modelClass'])->toBe(User::class);
+    expect($array['attributes'])->toBe($user->getAttributes());
+    expect($array['exists'])->toBeTrue();
+});
+
+it('reconstructs from array and rehydrates the model', function () {
+    $user = User::factory()->create([
+        'name' => 'From Array User',
+        'email' => 'from-array@example.com',
+    ]);
+
+    $dto = CachedUserData::fromModel($user);
+    $reconstructed = CachedUserData::fromArray($dto->toArray());
+    $rehydrated = $reconstructed->toAuthenticatable();
+
+    expect($rehydrated)->toBeInstanceOf(User::class);
+    expect($rehydrated->getKey())->toBe($user->getKey());
+    expect($rehydrated->name)->toBe('From Array User');
+    expect($rehydrated->email)->toBe('from-array@example.com');
+});
+
+it('survives a restricted unserialize roundtrip as array', function () {
+    // Mirrors Laravel's `cache.serializable_classes => false` setting, where
+    // objects become `__PHP_Incomplete_Class` but plain arrays survive.
+    $user = User::factory()->create();
+
+    $payload = serialize(CachedUserData::fromModel($user)->toArray());
+    $result = unserialize($payload, ['allowed_classes' => false]);
+
+    expect($result)->toBeArray();
+
+    $rehydrated = CachedUserData::fromArray($result)->toAuthenticatable();
+
+    expect($rehydrated)->toBeInstanceOf(User::class);
+    expect($rehydrated->getKey())->toBe($user->getKey());
+});
