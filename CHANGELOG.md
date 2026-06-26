@@ -2,6 +2,14 @@
 
 All notable changes to `laravel-auth-cache` will be documented in this file.
 
+## v1.1.0 - 2026-06-26
+
+### What's Changed
+
+* Fix laravel 13 compatibility model serialize  by @diegobvasco in https://github.com/diegobvasco/laravel-auth-cache/pull/10
+
+**Full Changelog**: https://github.com/diegobvasco/laravel-auth-cache/compare/1.0.3...1.1.0
+
 ## V1.0.2 - 2026-03-19
 
 ### What's Changed
