@@ -29,15 +29,15 @@ class CachedEloquentUserProvider extends EloquentUserProvider
             callback: function () use ($identifier) {
                 $result = parent::retrieveById($identifier);
 
-                return CachedUserData::from($result);
+                return CachedUserData::from($result)->toArray();
             }
         );
 
-        if (! $cachedData instanceof CachedUserData) {
+        if (! is_array($cachedData)) {
             return $cachedData;
         }
 
-        return $cachedData->toAuthenticatable();
+        return CachedUserData::fromArray($cachedData)->toAuthenticatable();
     }
 
     public function removeCache($model, $identifier): void
