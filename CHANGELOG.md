@@ -2,7 +2,7 @@
 
 All notable changes to `laravel-auth-cache` will be documented in this file.
 
-## 2.0.0 - Unreleased
+## 2.0.0 - 2026-07-25
 
 ### Breaking Changes (refactor)
 
