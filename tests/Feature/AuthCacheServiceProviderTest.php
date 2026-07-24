@@ -65,3 +65,13 @@ it('respects a custom bound cache key generator (container override)', function 
 
     expect(cache()->has($customKey))->toBeTrue();
 });
+
+it('throws when an unknown cache store is configured', function () {
+    config()->set('auth-cache.cache.store', 'nonexistent_store');
+    config()->set('auth.providers.cached_eloquent', [
+        'driver' => 'cachedEloquent',
+        'model' => User::class,
+    ]);
+
+    Auth::createUserProvider('cached_eloquent');
+})->throws(InvalidArgumentException::class);

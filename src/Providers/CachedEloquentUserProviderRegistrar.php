@@ -51,10 +51,11 @@ class CachedEloquentUserProviderRegistrar
 
     private function getCacheRepository(?string $store): Repository
     {
-        try {
-            return $store ? Cache::store($store) : Cache::store();
-        } catch (\Throwable $e) {
-            return Cache::store('array');
+        if ($store === null) {
+            return Cache::store();
         }
+
+        // Fail fast: an unknown store indicates misconfiguration.
+        return Cache::store($store);
     }
 }

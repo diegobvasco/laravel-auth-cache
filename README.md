@@ -69,15 +69,13 @@ Publish the config file and adjust the cache settings in `config/auth-cache.php`
 
 ```php
 return [
-    'auth' => [
-        'cache' => [
-            'enabled' => env('AUTH_CACHE_ENABLED', true),
-            'ttl' => env('AUTH_CACHE_TTL', 60),
-            'store' => env('AUTH_CACHE_STORE', null),
-            'prefix' => env('AUTH_CACHE_PREFIX', 'auth'),
-        ],
+    'cache' => [
+        'enabled' => env('AUTH_CACHE_ENABLED', true),
+        'ttl' => env('AUTH_CACHE_TTL', 60),
+        'store' => env('AUTH_CACHE_STORE', null),
+        'prefix' => env('AUTH_CACHE_PREFIX', 'auth'),
     ],
-],
+];
 ```
 
 #### Configuration Options
@@ -126,22 +124,22 @@ The example use `ObservedBy` to register the observer but you can use traditiona
 
 ### Per-Guard Configuration
 
-You can override cache settings per-guard in `config/auth.php`:
+You can override cache settings per-provider in `config/auth.php` by adding a `cache` key to the provider definition. These values are merged on top of the global `config/auth-cache.php` settings:
 
 ```php
-'guards' => [
-    'web' => [
-        'driver' => 'session',
-        'provider' => 'users',
+'providers' => [
+    'users' => [
+        'driver' => 'cachedEloquent',
+        'model' => App\Models\User::class,
         'cache' => [
-            'ttl' => 120, // Override to 2 minutes for web
+            'ttl' => 120, // Override to 120 minutes for this provider
         ],
     ],
-    'api' => [
-        'driver' => 'token',
-        'provider' => 'users',
+    'api_users' => [
+        'driver' => 'cachedEloquent',
+        'model' => App\Models\ApiUser::class,
         'cache' => [
-            'enabled' => false, // Disable cache for API
+            'enabled' => false, // Disable cache for this provider
         ],
     ],
 ],
@@ -216,7 +214,7 @@ Event::listen(CacheInvalidationRequested::class, function ($event) {
 Create your own key generation strategy:
 
 ```php
-use DiegoVasconcelos\AuthCache\Contracts\CacheKeyGeneratorInterface;
+use DiegoVasconcelos\AuthCache\Cache\Contracts\CacheKeyGeneratorInterface;
 
 class CustomKeyGenerator implements CacheKeyGeneratorInterface
 {
@@ -238,13 +236,13 @@ app()->bind(
 Implement your own invalidation logic:
 
 ```php
-use DiegoVasconcelos\AuthCache\Contracts\CacheInvalidatorInterface;
+use DiegoVasconcelos\AuthCache\Cache\Contracts\CacheInvalidatorInterface;
 
 class CustomInvalidator implements CacheInvalidatorInterface
 {
     public function invalidate(object $model, mixed $identifier): void
     {
-        // Your custom logic (e.g., log, broadcast, etc.)
+        // Your custom logic (e.g. log, broadcast, etc.)
         Cache::forget("custom.key.{$identifier}");
     }
 }
@@ -260,7 +258,7 @@ app()->bind(
 Modify configuration at runtime:
 
 ```php
-use DiegoVasconcelos\AuthCache\Contracts\CacheConfigurationInterface;
+use DiegoVasconcelos\AuthCache\Cache\Contracts\CacheConfigurationInterface;
 
 app()->afterResolving(CacheConfigurationInterface::class, function ($config) {
     // Customize based on environment, user roles, etc.

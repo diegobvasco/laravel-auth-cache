@@ -15,6 +15,8 @@ All notable changes to `laravel-auth-cache` will be documented in this file.
 - Consolidated all cache collaborators under the `DiegoVasconcelos\AuthCache\Cache` namespace (implementations, value objects, and `Cache\Contracts` interfaces). Removed the now-empty `Auth/` cache classes, `ValueObjects/`, and `Contracts/Cache/` locations.
 - Folded the `CacheConfig` DTO into `CacheConfiguration` (the class now holds the validated fields directly). Removed `CacheConfig`, its `with*()` methods, and `CacheConfiguration::getConfig()`.
 - Enforced the TTL invariant: `CacheConfiguration::fromArray()` now validates the TTL through the `CacheTtl` value object, so out-of-range values (below 1 or above 525600 minutes) throw at boot instead of being silently accepted.
+- An unknown `AUTH_CACHE_STORE` now throws instead of silently falling back to the array store, surfacing misconfiguration immediately.
+- Documentation fixes: corrected the `config/auth-cache.php` nesting, moved per-guard cache overrides to the provider config (where they are actually read), and updated customization examples to the new `Cache\Contracts` namespaces.
 
 ## v1.1.0 - 2026-06-26
 
