@@ -22,7 +22,6 @@ function makeProvider(
     $cacheManager = new CacheManager(
         cache: $cacheRepository,
         configuration: $cacheConfiguration,
-        keyGenerator: $cacheKeyGenerator
     );
 
     $provider = new CachedEloquentUserProvider(
@@ -30,6 +29,7 @@ function makeProvider(
         model: User::class,
         cache: $cacheManager,
         keyGenerator: $cacheKeyGenerator,
+        configuration: $cacheConfiguration,
     );
 
     return [$provider, $cacheKeyGenerator];

@@ -11,6 +11,7 @@ All notable changes to `laravel-auth-cache` will be documented in this file.
 - Standardized the invalidation identifier: `CachedAuthObserver` now dispatches using `$user->getKey()` to match the trait and the cache key generation.
 - `CachedEloquentUserProvider` now depends on `CacheInterface` + `CacheKeyGeneratorInterface` (and its constructor signature changed) instead of the concrete `CacheManager`.
 - `CachedEloquentUserProviderRegistrar` now resolves collaborators from the container, so custom interface bindings (e.g. `CacheKeyGeneratorInterface`) are actually respected. Cache collaborators are registered as contextual bindings (`bind`) to support per-guard configuration.
+- Slimmed `CacheInterface` to only cache operations (`remember`, `forget`). Removed `isEnabled()` and `getTtl()` from the interface (they belong to configuration). `CacheManager` no longer wraps a key generator or exposes `generateKey()`/`isEnabled()`/`getTtl()`.
 
 ## v1.1.0 - 2026-06-26
 

@@ -36,6 +36,7 @@ class CachedEloquentUserProviderRegistrar
             model: $config['model'],
             cache: $cacheManager,
             keyGenerator: $keyGenerator,
+            configuration: $configuration,
         );
     }
 

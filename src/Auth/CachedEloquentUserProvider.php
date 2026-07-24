@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DiegoVasconcelos\AuthCache\Auth;
 
+use DiegoVasconcelos\AuthCache\Contracts\Cache\CacheConfigurationInterface;
 use DiegoVasconcelos\AuthCache\Contracts\Cache\CacheInterface;
 use DiegoVasconcelos\AuthCache\Contracts\Cache\CacheKeyGeneratorInterface;
 use DiegoVasconcelos\AuthCache\DTOs\CachedUserData;
@@ -18,6 +19,7 @@ class CachedEloquentUserProvider extends EloquentUserProvider
         $model,
         private CacheInterface $cache,
         private CacheKeyGeneratorInterface $keyGenerator,
+        private CacheConfigurationInterface $configuration,
     ) {
         parent::__construct($hasher, $model);
     }
@@ -26,7 +28,7 @@ class CachedEloquentUserProvider extends EloquentUserProvider
     {
         $cachedData = $this->cache->remember(
             key: $this->keyGenerator->generate($this->getModel(), $identifier),
-            ttl: now()->addMinutes($this->cache->getTtl()),
+            ttl: now()->addMinutes($this->configuration->getTtl()),
             callback: function () use ($identifier) {
                 $result = parent::retrieveById($identifier);
 

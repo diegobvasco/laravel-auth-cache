@@ -76,14 +76,9 @@ class AuthCacheServiceProvider extends ServiceProvider
     private function bindCacheManager(): void
     {
         $this->app->bind(CacheInterface::class, function ($app, array $params = []) {
-            $configuration = $params['configuration'] ?? $app->make(CacheConfigurationInterface::class);
-
             return new CacheManager(
                 cache: $params['cache'] ?? Cache::store(),
-                configuration: $configuration,
-                keyGenerator: $app->make(CacheKeyGeneratorInterface::class, [
-                    'configuration' => $configuration,
-                ]),
+                configuration: $params['configuration'] ?? $app->make(CacheConfigurationInterface::class),
             );
         });
     }
