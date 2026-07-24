@@ -17,9 +17,11 @@ class CacheConfiguration implements CacheConfigurationInterface
 
     public static function fromArray(array $config): self
     {
+        $ttl = new CacheTtl((int) ($config['ttl'] ?? 60));
+
         return new self(
             enabled: (bool) ($config['enabled'] ?? true),
-            ttl: (int) ($config['ttl'] ?? 60),
+            ttl: $ttl->value(),
             prefix: (string) ($config['prefix'] ?? 'auth'),
             store: $config['store'] ?? null,
         );

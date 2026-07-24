@@ -67,3 +67,17 @@ it('returns null store when not specified', function () {
 
     expect($config->getStore())->toBeNull();
 });
+
+it('throws when ttl is below the minimum', function () {
+    CacheConfiguration::fromArray(['ttl' => 0]);
+})->throws(InvalidArgumentException::class);
+
+it('throws when ttl exceeds the maximum', function () {
+    CacheConfiguration::fromArray(['ttl' => 525601]);
+})->throws(InvalidArgumentException::class);
+
+it('accepts the default ttl without throwing', function () {
+    $config = CacheConfiguration::fromArray([]);
+
+    expect($config->getTtl())->toBe(60);
+});
