@@ -6,8 +6,8 @@ namespace DiegoVasconcelos\AuthCache\Providers;
 
 use DiegoVasconcelos\AuthCache\Auth\CacheConfiguration;
 use DiegoVasconcelos\AuthCache\Auth\CachedEloquentUserProvider;
-use DiegoVasconcelos\AuthCache\Auth\CacheKeyGenerator;
-use DiegoVasconcelos\AuthCache\Auth\CacheManager;
+use DiegoVasconcelos\AuthCache\Contracts\Cache\CacheInterface;
+use DiegoVasconcelos\AuthCache\Contracts\Cache\CacheKeyGeneratorInterface;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Cache;
@@ -20,20 +20,22 @@ class CachedEloquentUserProviderRegistrar
 
         $cacheRepository = $this->getCacheRepository($cacheConfig['store'] ?? null);
 
-        $cacheConfiguration = CacheConfiguration::fromArray($cacheConfig);
+        $configuration = CacheConfiguration::fromArray($cacheConfig);
 
-        $cacheKeyGenerator = new CacheKeyGenerator($cacheConfiguration);
+        $cacheManager = $app->make(CacheInterface::class, [
+            'cache' => $cacheRepository,
+            'configuration' => $configuration,
+        ]);
 
-        $cacheManager = new CacheManager(
-            cache: $cacheRepository,
-            configuration: $cacheConfiguration,
-            keyGenerator: $cacheKeyGenerator
-        );
+        $keyGenerator = $app->make(CacheKeyGeneratorInterface::class, [
+            'configuration' => $configuration,
+        ]);
 
         return new CachedEloquentUserProvider(
             hasher: $app['hash'],
             model: $config['model'],
-            cacheManager: $cacheManager,
+            cache: $cacheManager,
+            keyGenerator: $keyGenerator,
         );
     }
 

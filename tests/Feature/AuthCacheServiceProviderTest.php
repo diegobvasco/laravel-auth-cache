@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use DiegoVasconcelos\AuthCache\Auth\CachedEloquentUserProvider;
 use DiegoVasconcelos\AuthCache\AuthCacheServiceProvider;
+use DiegoVasconcelos\AuthCache\Contracts\Cache\CacheKeyGeneratorInterface;
 use DiegoVasconcelos\AuthCache\Tests\Fixtures\Models\User;
 use Illuminate\Support\Facades\Auth;
 
@@ -34,4 +35,33 @@ it('verify if auth provider is registered', function () {
     $provider = Auth::createUserProvider('cached_eloquent');
 
     expect($provider)->toBeInstanceOf(CachedEloquentUserProvider::class);
+});
+
+it('respects a custom bound cache key generator (container override)', function () {
+    $customKey = 'custom.resolved.key';
+
+    app()->bind(CacheKeyGeneratorInterface::class, function () use ($customKey) {
+        return new class($customKey) implements CacheKeyGeneratorInterface
+        {
+            public function __construct(private string $key) {}
+
+            public function generate(string $modelClass, mixed $identifier): string
+            {
+                return $this->key;
+            }
+        };
+    });
+
+    config()->set('auth.providers.cached_eloquent', [
+        'driver' => 'cachedEloquent',
+        'model' => User::class,
+    ]);
+
+    $provider = Auth::createUserProvider('cached_eloquent');
+
+    $user = User::factory()->create();
+
+    $provider->retrieveById($user->id);
+
+    expect(cache()->has($customKey))->toBeTrue();
 });

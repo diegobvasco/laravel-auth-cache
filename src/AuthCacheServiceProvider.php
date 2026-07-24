@@ -66,30 +66,38 @@ class AuthCacheServiceProvider extends ServiceProvider
 
     private function bindCacheKeyGenerator(): void
     {
-        $this->app->singleton(CacheKeyGeneratorInterface::class, function ($app) {
+        $this->app->bind(CacheKeyGeneratorInterface::class, function ($app, array $params = []) {
             return new CacheKeyGenerator(
-                $app->make(CacheConfigurationInterface::class)
+                $params['configuration'] ?? $app->make(CacheConfigurationInterface::class)
             );
         });
     }
 
     private function bindCacheManager(): void
     {
-        $this->app->singleton(CacheInterface::class, function ($app) {
+        $this->app->bind(CacheInterface::class, function ($app, array $params = []) {
+            $configuration = $params['configuration'] ?? $app->make(CacheConfigurationInterface::class);
+
             return new CacheManager(
-                cache: Cache::store(),
-                configuration: $app->make(CacheConfigurationInterface::class),
-                keyGenerator: $app->make(CacheKeyGeneratorInterface::class)
+                cache: $params['cache'] ?? Cache::store(),
+                configuration: $configuration,
+                keyGenerator: $app->make(CacheKeyGeneratorInterface::class, [
+                    'configuration' => $configuration,
+                ]),
             );
         });
     }
 
     private function bindCacheInvalidator(): void
     {
-        $this->app->singleton(CacheInvalidatorInterface::class, function ($app) {
+        $this->app->bind(CacheInvalidatorInterface::class, function ($app, array $params = []) {
+            $configuration = $params['configuration'] ?? $app->make(CacheConfigurationInterface::class);
+
             return new CacheInvalidator(
-                cache: Cache::store(),
-                keyGenerator: $app->make(CacheKeyGeneratorInterface::class)
+                cache: $params['cache'] ?? Cache::store(),
+                keyGenerator: $app->make(CacheKeyGeneratorInterface::class, [
+                    'configuration' => $configuration,
+                ]),
             );
         });
     }
