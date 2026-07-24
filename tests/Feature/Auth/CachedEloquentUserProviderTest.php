@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use DiegoVasconcelos\AuthCache\Auth\CacheConfiguration;
 use DiegoVasconcelos\AuthCache\Auth\CachedEloquentUserProvider;
-use DiegoVasconcelos\AuthCache\Auth\CacheKeyGenerator;
-use DiegoVasconcelos\AuthCache\Auth\CacheManager;
+use DiegoVasconcelos\AuthCache\Cache\CacheConfiguration;
+use DiegoVasconcelos\AuthCache\Cache\CacheKeyGenerator;
+use DiegoVasconcelos\AuthCache\Cache\CacheManager;
 use DiegoVasconcelos\AuthCache\Tests\Fixtures\Models\User;
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\Repository;

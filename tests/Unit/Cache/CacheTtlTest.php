@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use DiegoVasconcelos\AuthCache\ValueObjects\CacheTtl;
+use DiegoVasconcelos\AuthCache\Cache\CacheTtl;
 
 it('creates a valid cache ttl', function () {
     $ttl = new CacheTtl(60);

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use DiegoVasconcelos\AuthCache\Auth\CacheConfiguration;
-use DiegoVasconcelos\AuthCache\Auth\CacheInvalidator;
-use DiegoVasconcelos\AuthCache\Auth\CacheKeyGenerator;
+use DiegoVasconcelos\AuthCache\Cache\CacheConfiguration;
+use DiegoVasconcelos\AuthCache\Cache\CacheInvalidator;
+use DiegoVasconcelos\AuthCache\Cache\CacheKeyGenerator;
 use DiegoVasconcelos\AuthCache\Events\CacheInvalidationRequested;
 use DiegoVasconcelos\AuthCache\Listeners\InvalidateCacheListener;
 use DiegoVasconcelos\AuthCache\Tests\Fixtures\Models\User;

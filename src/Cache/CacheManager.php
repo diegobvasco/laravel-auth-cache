@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace DiegoVasconcelos\AuthCache\Auth;
+namespace DiegoVasconcelos\AuthCache\Cache;
 
-use DiegoVasconcelos\AuthCache\Contracts\Cache\CacheConfigurationInterface;
-use DiegoVasconcelos\AuthCache\Contracts\Cache\CacheInterface;
+use DiegoVasconcelos\AuthCache\Cache\Contracts\CacheConfigurationInterface;
+use DiegoVasconcelos\AuthCache\Cache\Contracts\CacheInterface;
 use Illuminate\Contracts\Cache\Repository;
 
 class CacheManager implements CacheInterface

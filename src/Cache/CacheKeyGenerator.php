@@ -2,11 +2,10 @@
 
 declare(strict_types=1);
 
-namespace DiegoVasconcelos\AuthCache\Auth;
+namespace DiegoVasconcelos\AuthCache\Cache;
 
-use DiegoVasconcelos\AuthCache\Contracts\Cache\CacheConfigurationInterface;
-use DiegoVasconcelos\AuthCache\Contracts\Cache\CacheKeyGeneratorInterface;
-use DiegoVasconcelos\AuthCache\ValueObjects\CacheKey;
+use DiegoVasconcelos\AuthCache\Cache\Contracts\CacheConfigurationInterface;
+use DiegoVasconcelos\AuthCache\Cache\Contracts\CacheKeyGeneratorInterface;
 
 readonly class CacheKeyGenerator implements CacheKeyGeneratorInterface
 {

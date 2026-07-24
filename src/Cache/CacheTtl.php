@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace DiegoVasconcelos\AuthCache\ValueObjects;
+namespace DiegoVasconcelos\AuthCache\Cache;
 
 use InvalidArgumentException;
 

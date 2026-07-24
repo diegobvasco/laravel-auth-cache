@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use DiegoVasconcelos\AuthCache\Auth\CacheConfiguration;
-use DiegoVasconcelos\AuthCache\Auth\CacheInvalidator;
-use DiegoVasconcelos\AuthCache\Auth\CacheKeyGenerator;
-use DiegoVasconcelos\AuthCache\Contracts\Cache\CacheInvalidatorInterface;
+use DiegoVasconcelos\AuthCache\Cache\CacheConfiguration;
+use DiegoVasconcelos\AuthCache\Cache\CacheInvalidator;
+use DiegoVasconcelos\AuthCache\Cache\CacheKeyGenerator;
+use DiegoVasconcelos\AuthCache\Cache\Contracts\CacheInvalidatorInterface;
 use DiegoVasconcelos\AuthCache\Tests\Fixtures\Models\User;
 use Illuminate\Contracts\Cache\Repository;
 

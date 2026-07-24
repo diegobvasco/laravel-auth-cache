@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace DiegoVasconcelos\AuthCache;
 
-use DiegoVasconcelos\AuthCache\Auth\CacheConfiguration;
-use DiegoVasconcelos\AuthCache\Auth\CacheInvalidator;
-use DiegoVasconcelos\AuthCache\Auth\CacheKeyGenerator;
-use DiegoVasconcelos\AuthCache\Auth\CacheManager;
-use DiegoVasconcelos\AuthCache\Contracts\Cache\CacheConfigurationInterface;
-use DiegoVasconcelos\AuthCache\Contracts\Cache\CacheInterface;
-use DiegoVasconcelos\AuthCache\Contracts\Cache\CacheInvalidatorInterface;
-use DiegoVasconcelos\AuthCache\Contracts\Cache\CacheKeyGeneratorInterface;
+use DiegoVasconcelos\AuthCache\Cache\CacheConfiguration;
+use DiegoVasconcelos\AuthCache\Cache\CacheInvalidator;
+use DiegoVasconcelos\AuthCache\Cache\CacheKeyGenerator;
+use DiegoVasconcelos\AuthCache\Cache\CacheManager;
+use DiegoVasconcelos\AuthCache\Cache\Contracts\CacheConfigurationInterface;
+use DiegoVasconcelos\AuthCache\Cache\Contracts\CacheInterface;
+use DiegoVasconcelos\AuthCache\Cache\Contracts\CacheInvalidatorInterface;
+use DiegoVasconcelos\AuthCache\Cache\Contracts\CacheKeyGeneratorInterface;
 use DiegoVasconcelos\AuthCache\Events\CacheInvalidationRequested;
 use DiegoVasconcelos\AuthCache\Listeners\InvalidateCacheListener;
 use DiegoVasconcelos\AuthCache\Providers\CachedEloquentUserProviderRegistrar;

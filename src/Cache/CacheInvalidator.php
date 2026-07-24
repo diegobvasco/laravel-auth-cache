@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace DiegoVasconcelos\AuthCache\Auth;
+namespace DiegoVasconcelos\AuthCache\Cache;
 
-use DiegoVasconcelos\AuthCache\Contracts\Cache\CacheInvalidatorInterface;
-use DiegoVasconcelos\AuthCache\Contracts\Cache\CacheKeyGeneratorInterface;
+use DiegoVasconcelos\AuthCache\Cache\Contracts\CacheInvalidatorInterface;
+use DiegoVasconcelos\AuthCache\Cache\Contracts\CacheKeyGeneratorInterface;
 use Illuminate\Contracts\Cache\Repository;
 
 readonly class CacheInvalidator implements CacheInvalidatorInterface

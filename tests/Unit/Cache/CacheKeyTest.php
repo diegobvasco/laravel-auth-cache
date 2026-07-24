@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use DiegoVasconcelos\AuthCache\ValueObjects\CacheKey;
+use DiegoVasconcelos\AuthCache\Cache\CacheKey;
 
 it('creates a valid cache key', function () {
     $key = new CacheKey('auth.user.123');

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace DiegoVasconcelos\AuthCache\Providers;
 
-use DiegoVasconcelos\AuthCache\Auth\CacheConfiguration;
 use DiegoVasconcelos\AuthCache\Auth\CachedEloquentUserProvider;
-use DiegoVasconcelos\AuthCache\Contracts\Cache\CacheInterface;
-use DiegoVasconcelos\AuthCache\Contracts\Cache\CacheKeyGeneratorInterface;
+use DiegoVasconcelos\AuthCache\Cache\CacheConfiguration;
+use DiegoVasconcelos\AuthCache\Cache\Contracts\CacheInterface;
+use DiegoVasconcelos\AuthCache\Cache\Contracts\CacheKeyGeneratorInterface;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Cache;

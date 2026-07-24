@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use DiegoVasconcelos\AuthCache\Auth\CacheConfiguration;
-use DiegoVasconcelos\AuthCache\Auth\CacheManager;
-use DiegoVasconcelos\AuthCache\Contracts\Cache\CacheInterface;
+use DiegoVasconcelos\AuthCache\Cache\CacheConfiguration;
+use DiegoVasconcelos\AuthCache\Cache\CacheManager;
+use DiegoVasconcelos\AuthCache\Cache\Contracts\CacheInterface;
 use Illuminate\Contracts\Cache\Repository;
 
 it('implements cache interface', function () {

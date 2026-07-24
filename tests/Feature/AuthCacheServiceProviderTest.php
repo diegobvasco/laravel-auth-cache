@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use DiegoVasconcelos\AuthCache\Auth\CachedEloquentUserProvider;
 use DiegoVasconcelos\AuthCache\AuthCacheServiceProvider;
-use DiegoVasconcelos\AuthCache\Contracts\Cache\CacheKeyGeneratorInterface;
+use DiegoVasconcelos\AuthCache\Cache\Contracts\CacheKeyGeneratorInterface;
 use DiegoVasconcelos\AuthCache\Tests\Fixtures\Models\User;
 use Illuminate\Support\Facades\Auth;
 

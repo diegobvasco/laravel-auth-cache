@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace DiegoVasconcelos\AuthCache\Auth;
 
-use DiegoVasconcelos\AuthCache\Contracts\Cache\CacheConfigurationInterface;
-use DiegoVasconcelos\AuthCache\Contracts\Cache\CacheInterface;
-use DiegoVasconcelos\AuthCache\Contracts\Cache\CacheKeyGeneratorInterface;
+use DiegoVasconcelos\AuthCache\Cache\Contracts\CacheConfigurationInterface;
+use DiegoVasconcelos\AuthCache\Cache\Contracts\CacheInterface;
+use DiegoVasconcelos\AuthCache\Cache\Contracts\CacheKeyGeneratorInterface;
 use DiegoVasconcelos\AuthCache\DTOs\CachedUserData;
 use Illuminate\Auth\EloquentUserProvider;
 use Illuminate\Contracts\Auth\Authenticatable;
