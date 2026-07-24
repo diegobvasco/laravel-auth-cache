@@ -11,11 +11,11 @@ class CachedAuthObserver
 {
     public function updated(Authenticatable $user): void
     {
-        CacheInvalidationRequested::dispatch($user, $user->getAuthIdentifier(), 'updated');
+        CacheInvalidationRequested::dispatch($user, $user->getKey(), 'updated');
     }
 
     public function deleted(Authenticatable $user): void
     {
-        CacheInvalidationRequested::dispatch($user, $user->getAuthIdentifier(), 'deleted');
+        CacheInvalidationRequested::dispatch($user, $user->getKey(), 'deleted');
     }
 }

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace DiegoVasconcelos\AuthCache\Auth;
 
-use DiegoVasconcelos\AuthCache\Contracts\Cache\CacheInvalidatorInterface;
 use DiegoVasconcelos\AuthCache\DTOs\CachedUserData;
 use Illuminate\Auth\EloquentUserProvider;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -16,7 +15,6 @@ class CachedEloquentUserProvider extends EloquentUserProvider
         $hasher,
         $model,
         private CacheManager $cacheManager,
-        private CacheInvalidatorInterface $cacheInvalidator
     ) {
         parent::__construct($hasher, $model);
     }
@@ -38,10 +36,5 @@ class CachedEloquentUserProvider extends EloquentUserProvider
         }
 
         return CachedUserData::fromArray($cachedData)->toAuthenticatable();
-    }
-
-    public function removeCache($model, $identifier): void
-    {
-        $this->cacheInvalidator->invalidate($model, $identifier);
     }
 }

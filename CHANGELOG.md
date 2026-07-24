@@ -2,6 +2,14 @@
 
 All notable changes to `laravel-auth-cache` will be documented in this file.
 
+## 2.0.0 - Unreleased
+
+### Breaking Changes (refactor)
+
+- Removed `CachedEloquentUserProvider::removeCache()`. Cache invalidation is now handled exclusively through the `CacheInvalidationRequested` event.
+- Removed the unused `EloquentInvalidatorStrategy` class (dead code, never wired).
+- Standardized the invalidation identifier: `CachedAuthObserver` now dispatches using `$user->getKey()` to match the trait and the cache key generation.
+
 ## v1.1.0 - 2026-06-26
 
 ### What's Changed

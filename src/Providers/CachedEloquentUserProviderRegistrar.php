@@ -6,7 +6,6 @@ namespace DiegoVasconcelos\AuthCache\Providers;
 
 use DiegoVasconcelos\AuthCache\Auth\CacheConfiguration;
 use DiegoVasconcelos\AuthCache\Auth\CachedEloquentUserProvider;
-use DiegoVasconcelos\AuthCache\Auth\CacheInvalidator;
 use DiegoVasconcelos\AuthCache\Auth\CacheKeyGenerator;
 use DiegoVasconcelos\AuthCache\Auth\CacheManager;
 use Illuminate\Contracts\Cache\Repository;
@@ -31,16 +30,10 @@ class CachedEloquentUserProviderRegistrar
             keyGenerator: $cacheKeyGenerator
         );
 
-        $cacheInvalidator = new CacheInvalidator(
-            cache: $cacheRepository,
-            keyGenerator: $cacheKeyGenerator
-        );
-
         return new CachedEloquentUserProvider(
             hasher: $app['hash'],
             model: $config['model'],
             cacheManager: $cacheManager,
-            cacheInvalidator: $cacheInvalidator
         );
     }
 
