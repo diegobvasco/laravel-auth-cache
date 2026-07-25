@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use DiegoVasconcelos\AuthCache\Auth\CacheConfiguration;
-use DiegoVasconcelos\AuthCache\Auth\CacheKeyGenerator;
-use DiegoVasconcelos\AuthCache\Contracts\Cache\CacheKeyGeneratorInterface;
+use DiegoVasconcelos\AuthCache\Cache\CacheConfiguration;
+use DiegoVasconcelos\AuthCache\Cache\CacheKeyGenerator;
+use DiegoVasconcelos\AuthCache\Cache\Contracts\CacheKeyGeneratorInterface;
 
 it('implements cache key generator interface', function () {
     $config = CacheConfiguration::fromArray(['prefix' => 'auth']);

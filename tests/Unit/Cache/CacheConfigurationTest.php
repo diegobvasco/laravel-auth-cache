@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use DiegoVasconcelos\AuthCache\Auth\CacheConfiguration;
-use DiegoVasconcelos\AuthCache\Contracts\Cache\CacheConfigurationInterface;
+use DiegoVasconcelos\AuthCache\Cache\CacheConfiguration;
+use DiegoVasconcelos\AuthCache\Cache\Contracts\CacheConfigurationInterface;
 use Illuminate\Support\Facades\Config;
 
 beforeEach(function () {
@@ -68,12 +68,16 @@ it('returns null store when not specified', function () {
     expect($config->getStore())->toBeNull();
 });
 
-it('returns the underlying cache config', function () {
-    $arrayConfig = ['enabled' => true, 'ttl' => 90, 'prefix' => 'test', 'store' => 'memcached'];
-    $config = CacheConfiguration::fromArray($arrayConfig);
+it('throws when ttl is below the minimum', function () {
+    CacheConfiguration::fromArray(['ttl' => 0]);
+})->throws(InvalidArgumentException::class);
 
-    expect($config->getConfig()->enabled)->toBeTrue();
-    expect($config->getConfig()->ttl)->toBe(90);
-    expect($config->getConfig()->prefix)->toBe('test');
-    expect($config->getConfig()->store)->toBe('memcached');
+it('throws when ttl exceeds the maximum', function () {
+    CacheConfiguration::fromArray(['ttl' => 525601]);
+})->throws(InvalidArgumentException::class);
+
+it('accepts the default ttl without throwing', function () {
+    $config = CacheConfiguration::fromArray([]);
+
+    expect($config->getTtl())->toBe(60);
 });

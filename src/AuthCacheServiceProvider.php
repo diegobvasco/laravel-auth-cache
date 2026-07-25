@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace DiegoVasconcelos\AuthCache;
 
-use DiegoVasconcelos\AuthCache\Auth\CacheConfiguration;
-use DiegoVasconcelos\AuthCache\Auth\CacheInvalidator;
-use DiegoVasconcelos\AuthCache\Auth\CacheKeyGenerator;
-use DiegoVasconcelos\AuthCache\Auth\CacheManager;
-use DiegoVasconcelos\AuthCache\Contracts\Cache\CacheConfigurationInterface;
-use DiegoVasconcelos\AuthCache\Contracts\Cache\CacheInterface;
-use DiegoVasconcelos\AuthCache\Contracts\Cache\CacheInvalidatorInterface;
-use DiegoVasconcelos\AuthCache\Contracts\Cache\CacheKeyGeneratorInterface;
+use DiegoVasconcelos\AuthCache\Cache\CacheConfiguration;
+use DiegoVasconcelos\AuthCache\Cache\CacheInvalidator;
+use DiegoVasconcelos\AuthCache\Cache\CacheKeyGenerator;
+use DiegoVasconcelos\AuthCache\Cache\CacheManager;
+use DiegoVasconcelos\AuthCache\Cache\Contracts\CacheConfigurationInterface;
+use DiegoVasconcelos\AuthCache\Cache\Contracts\CacheInterface;
+use DiegoVasconcelos\AuthCache\Cache\Contracts\CacheInvalidatorInterface;
+use DiegoVasconcelos\AuthCache\Cache\Contracts\CacheKeyGeneratorInterface;
 use DiegoVasconcelos\AuthCache\Events\CacheInvalidationRequested;
 use DiegoVasconcelos\AuthCache\Listeners\InvalidateCacheListener;
 use DiegoVasconcelos\AuthCache\Providers\CachedEloquentUserProviderRegistrar;
@@ -66,30 +66,33 @@ class AuthCacheServiceProvider extends ServiceProvider
 
     private function bindCacheKeyGenerator(): void
     {
-        $this->app->singleton(CacheKeyGeneratorInterface::class, function ($app) {
+        $this->app->bind(CacheKeyGeneratorInterface::class, function ($app, array $params = []) {
             return new CacheKeyGenerator(
-                $app->make(CacheConfigurationInterface::class)
+                $params['configuration'] ?? $app->make(CacheConfigurationInterface::class)
             );
         });
     }
 
     private function bindCacheManager(): void
     {
-        $this->app->singleton(CacheInterface::class, function ($app) {
+        $this->app->bind(CacheInterface::class, function ($app, array $params = []) {
             return new CacheManager(
-                cache: Cache::store(),
-                configuration: $app->make(CacheConfigurationInterface::class),
-                keyGenerator: $app->make(CacheKeyGeneratorInterface::class)
+                cache: $params['cache'] ?? Cache::store(),
+                configuration: $params['configuration'] ?? $app->make(CacheConfigurationInterface::class),
             );
         });
     }
 
     private function bindCacheInvalidator(): void
     {
-        $this->app->singleton(CacheInvalidatorInterface::class, function ($app) {
+        $this->app->bind(CacheInvalidatorInterface::class, function ($app, array $params = []) {
+            $configuration = $params['configuration'] ?? $app->make(CacheConfigurationInterface::class);
+
             return new CacheInvalidator(
-                cache: Cache::store(),
-                keyGenerator: $app->make(CacheKeyGeneratorInterface::class)
+                cache: $params['cache'] ?? Cache::store(),
+                keyGenerator: $app->make(CacheKeyGeneratorInterface::class, [
+                    'configuration' => $configuration,
+                ]),
             );
         });
     }

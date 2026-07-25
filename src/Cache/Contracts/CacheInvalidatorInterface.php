@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace DiegoVasconcelos\AuthCache\Contracts\Cache;
+namespace DiegoVasconcelos\AuthCache\Cache\Contracts;
 
 interface CacheInvalidatorInterface
 {

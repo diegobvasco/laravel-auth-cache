@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace DiegoVasconcelos\AuthCache\Providers;
 
-use DiegoVasconcelos\AuthCache\Auth\CacheConfiguration;
 use DiegoVasconcelos\AuthCache\Auth\CachedEloquentUserProvider;
-use DiegoVasconcelos\AuthCache\Auth\CacheInvalidator;
-use DiegoVasconcelos\AuthCache\Auth\CacheKeyGenerator;
-use DiegoVasconcelos\AuthCache\Auth\CacheManager;
+use DiegoVasconcelos\AuthCache\Cache\CacheConfiguration;
+use DiegoVasconcelos\AuthCache\Cache\Contracts\CacheInterface;
+use DiegoVasconcelos\AuthCache\Cache\Contracts\CacheKeyGeneratorInterface;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Cache;
@@ -21,26 +20,23 @@ class CachedEloquentUserProviderRegistrar
 
         $cacheRepository = $this->getCacheRepository($cacheConfig['store'] ?? null);
 
-        $cacheConfiguration = CacheConfiguration::fromArray($cacheConfig);
+        $configuration = CacheConfiguration::fromArray($cacheConfig);
 
-        $cacheKeyGenerator = new CacheKeyGenerator($cacheConfiguration);
+        $cacheManager = $app->make(CacheInterface::class, [
+            'cache' => $cacheRepository,
+            'configuration' => $configuration,
+        ]);
 
-        $cacheManager = new CacheManager(
-            cache: $cacheRepository,
-            configuration: $cacheConfiguration,
-            keyGenerator: $cacheKeyGenerator
-        );
-
-        $cacheInvalidator = new CacheInvalidator(
-            cache: $cacheRepository,
-            keyGenerator: $cacheKeyGenerator
-        );
+        $keyGenerator = $app->make(CacheKeyGeneratorInterface::class, [
+            'configuration' => $configuration,
+        ]);
 
         return new CachedEloquentUserProvider(
             hasher: $app['hash'],
             model: $config['model'],
-            cacheManager: $cacheManager,
-            cacheInvalidator: $cacheInvalidator
+            cache: $cacheManager,
+            keyGenerator: $keyGenerator,
+            configuration: $configuration,
         );
     }
 
@@ -55,10 +51,11 @@ class CachedEloquentUserProviderRegistrar
 
     private function getCacheRepository(?string $store): Repository
     {
-        try {
-            return $store ? Cache::store($store) : Cache::store();
-        } catch (\Throwable $e) {
-            return Cache::store('array');
+        if ($store === null) {
+            return Cache::store();
         }
+
+        // Fail fast: an unknown store indicates misconfiguration.
+        return Cache::store($store);
     }
 }
