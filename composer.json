@@ -63,9 +63,7 @@
             "providers": [
                 "DiegoVasconcelos\\AuthCache\\AuthCacheServiceProvider"
             ],
-            "aliases": {
-
-            }
+            "aliases": {}
         }
     },
     "minimum-stability": "dev",

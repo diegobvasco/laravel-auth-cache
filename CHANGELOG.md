@@ -2,6 +2,17 @@
 
 All notable changes to `laravel-auth-cache` will be documented in this file.
 
+## [2.0.0](https://github.com/diegobvasco/laravel-auth-cache/compare/1.1.0...v2.0.0) (2026-07-25)
+
+
+### ⚠ BREAKING CHANGES
+
+* **cache:** removeCache() and EloquentInvalidatorStrategy are removed.
+
+### Code Refactoring
+
+* **cache:** consolidate responsibilities & fix DI ([#14](https://github.com/diegobvasco/laravel-auth-cache/issues/14)) ([47c4f73](https://github.com/diegobvasco/laravel-auth-cache/commit/47c4f732cd281d1660dd335d11391d36a48449c0))
+
 ## v1.1.0 - 2026-06-26
 
 ### What's Changed
@@ -79,4 +90,3 @@ All notable changes to `laravel-auth-cache` will be documented in this file.
 - Per-guard configuration support
   
 - Configurable cache store, TTL, and prefix
-  
