@@ -1,6 +1,10 @@
 name: Unit Tests
 
-on: ['push', 'pull_request']
+on:
+  push:
+    branches:
+      - main
+  pull_request:
 
 jobs:
   test:
@@ -31,7 +35,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: dom, mbstring, zip
+          extensions: dom, mbstring, zip, fileinfo
           coverage: pcov
 
       - name: Setup problem matchers
