@@ -49,7 +49,7 @@
         "lint": "vendor/bin/pint",
         "test:unit": "vendor/bin/pest --parallel --coverage --min=100",
         "test:lint": "vendor/bin/pint --parallel --test",
-        "test:type": "vendor/bin/phpstan analyse --memory-limit=1G",
+        "test:types": "vendor/bin/phpstan analyse --memory-limit=1G",
         "test": [
             "@test:lint",
             "@test:unit",
