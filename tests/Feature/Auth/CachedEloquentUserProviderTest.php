@@ -113,6 +113,20 @@ it('handles null returns from provider', function () {
     expect($cachedValue['type'])->toBe('null');
 });
 
+it('returns non-array cached value directly', function () {
+    $user = User::factory()->create();
+
+    [$provider, $cacheKeyGenerator] = makeProvider();
+
+    $cacheKey = $cacheKeyGenerator->generate(User::class, $user->id);
+
+    Cache::put($cacheKey, 'plain-string-value');
+
+    $result = $provider->retrieveById($user->id);
+
+    expect($result)->toBe('plain-string-value');
+});
+
 it('works when the cache store restricts unserializable classes', function () {
     // Simulates Laravel's `cache.serializable_classes => false` security setting,
     // which converts every cached object into `__PHP_Incomplete_Class` on read.
