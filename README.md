@@ -1,8 +1,8 @@
 # Laravel Auth Cache
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/diegobvasco/laravel-auth-cache.svg?style=flat-square)](https://packagist.org/packages/diegobvasco/laravel-auth-cache)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/diegobvasco/laravel-auth-cache/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/diegobvasco/laravel-auth-cache/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/diegobvasco/laravel-auth-cache/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/diegobvasco/laravel-auth-cache/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
+[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/diegobvasco/laravel-auth-cache/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/diegobvasco/laravel-auth-cache/actions?query=workflow%3Aunit-tests+branch%3Amain)
+[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/diegobvasco/laravel-auth-cache/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/diegobvasco/laravel-auth-cache/actions?query=workflow%3A"Format+tests"+branch%3Amain)
 [![Total Downloads](https://img.shields.io/packagist/dt/diegobvasco/laravel-auth-cache.svg?style=flat-square)](https://packagist.org/packages/diegobvasco/laravel-auth-cache)
 
 A Laravel authentication caching package that provides optimized user retrieval with automatic cache invalidation. Built with SOLID principles, dependency injection, and event-driven architecture for maintainable and testable code.
