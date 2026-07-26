@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 use DiegoVasconcelos\AuthCache\Auth\CachedEloquentUserProvider;
 use DiegoVasconcelos\AuthCache\AuthCacheServiceProvider;
+use DiegoVasconcelos\AuthCache\Cache\CacheConfiguration;
+use DiegoVasconcelos\AuthCache\Cache\CacheInvalidator;
+use DiegoVasconcelos\AuthCache\Cache\Contracts\CacheConfigurationInterface;
+use DiegoVasconcelos\AuthCache\Cache\Contracts\CacheInvalidatorInterface;
 use DiegoVasconcelos\AuthCache\Cache\Contracts\CacheKeyGeneratorInterface;
 use DiegoVasconcelos\AuthCache\Tests\Fixtures\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -64,6 +68,22 @@ it('respects a custom bound cache key generator (container override)', function 
     $provider->retrieveById($user->id);
 
     expect(cache()->has($customKey))->toBeTrue();
+});
+
+it('resolves cache configuration singleton from the container', function () {
+    expect(app()->bound(CacheConfigurationInterface::class))->toBeTrue();
+
+    $config = app()->make(CacheConfigurationInterface::class);
+
+    expect($config)->toBeInstanceOf(CacheConfiguration::class);
+});
+
+it('resolves cache invalidator from the container', function () {
+    expect(app()->bound(CacheInvalidatorInterface::class))->toBeTrue();
+
+    $invalidator = app()->make(CacheInvalidatorInterface::class);
+
+    expect($invalidator)->toBeInstanceOf(CacheInvalidator::class);
 });
 
 it('throws when an unknown cache store is configured', function () {
