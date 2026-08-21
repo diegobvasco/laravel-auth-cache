@@ -2,6 +2,13 @@
 
 All notable changes to `laravel-auth-cache` will be documented in this file.
 
+## [2.0.1](https://github.com/diegobvasco/laravel-auth-cache/compare/v2.0.0...v2.0.1) (2026-08-21)
+
+
+### Miscellaneous Chores
+
+* **deps:** bump actions/cache from 5.0.5 to 6.1.0 ([#19](https://github.com/diegobvasco/laravel-auth-cache/issues/19)) ([9cff373](https://github.com/diegobvasco/laravel-auth-cache/commit/9cff373b2a310451eefc9dd793595253e07590b2))
+
 ## [2.0.0](https://github.com/diegobvasco/laravel-auth-cache/compare/1.1.0...v2.0.0) (2026-07-25)
 
 
