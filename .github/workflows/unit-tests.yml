@@ -58,6 +58,10 @@ jobs:
 
       - name: Install dependencies
         run: |
+          # The matrix deliberately installs old (and therefore advisory-affected)
+          # framework releases via prefer-lowest; Composer >= 2.9 blocks those by
+          # default, which would break dependency resolution.
+          composer config policy.advisories.block false
           composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
           composer update --${{ matrix.stability }} --prefer-dist --no-interaction
 
