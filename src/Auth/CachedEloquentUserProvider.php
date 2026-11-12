@@ -7,6 +7,7 @@ namespace DiegoVasconcelos\AuthCache\Auth;
 use DiegoVasconcelos\AuthCache\Cache\Contracts\CacheConfigurationInterface;
 use DiegoVasconcelos\AuthCache\Cache\Contracts\CacheInterface;
 use DiegoVasconcelos\AuthCache\Cache\Contracts\CacheKeyGeneratorInterface;
+use DiegoVasconcelos\AuthCache\Cache\Exceptions\CorruptedCacheEntry;
 use DiegoVasconcelos\AuthCache\DTOs\CachedUserData;
 use Illuminate\Auth\EloquentUserProvider;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -24,22 +25,33 @@ class CachedEloquentUserProvider extends EloquentUserProvider
         parent::__construct($hasher, $model);
     }
 
-    public function retrieveById($identifier): string|(Model&Authenticatable)|null
+    public function retrieveById($identifier): (Model&Authenticatable)|null
     {
-        $cachedData = $this->cache->remember(
-            key: $this->keyGenerator->generate($this->getModel(), $identifier),
-            ttl: now()->addMinutes($this->configuration->getTtl()),
-            callback: function () use ($identifier) {
-                $result = parent::retrieveById($identifier);
+        $key = $this->keyGenerator->generate($this->getModel(), $identifier);
 
-                return CachedUserData::from($result)->toArray();
+        $cached = $this->cache->get($key);
+
+        if (is_array($cached)) {
+            try {
+                return CachedUserData::fromArray($cached)->toAuthenticatable();
+            } catch (CorruptedCacheEntry) {
+                // Stale payload (e.g. a renamed model class or a legacy shape):
+                // treat it as a miss and rebuild from the database below.
             }
-        );
-
-        if (! is_array($cachedData)) {
-            return $cachedData;
         }
 
-        return CachedUserData::fromArray($cachedData)->toAuthenticatable();
+        $result = parent::retrieveById($identifier);
+
+        if ($result === null) {
+            return null;
+        }
+
+        $this->cache->put(
+            key: $key,
+            value: CachedUserData::fromModel($result)->toArray(),
+            expiresAt: now()->addMinutes($this->configuration->getTtl()),
+        );
+
+        return $result;
     }
 }

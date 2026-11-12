@@ -9,21 +9,25 @@ use DiegoVasconcelos\AuthCache\Cache\Contracts\CacheConfigurationInterface;
 class CacheConfiguration implements CacheConfigurationInterface
 {
     public function __construct(
-        public readonly bool $enabled,
-        public readonly int $ttl,
-        public readonly string $prefix,
-        public readonly ?string $store,
+        private readonly bool $enabled,
+        private readonly int $ttl,
+        private readonly string $prefix,
+        private readonly ?string $store,
     ) {}
 
     public static function fromArray(array $config): self
     {
-        $ttl = new CacheTtl((int) ($config['ttl'] ?? 60));
+        $enabled = (bool) ($config['enabled'] ?? true);
+
+        $ttl = $enabled
+            ? new CacheTtl(filter_var($config['ttl'] ?? 60, FILTER_VALIDATE_INT, ['options' => ['default' => 60]]))->value()
+            : 0;
 
         return new self(
-            enabled: (bool) ($config['enabled'] ?? true),
-            ttl: $ttl->value(),
+            enabled: $enabled,
+            ttl: $ttl,
             prefix: (string) ($config['prefix'] ?? 'auth'),
-            store: $config['store'] ?? null,
+            store: is_string($config['store'] ?? null) && $config['store'] !== '' ? $config['store'] : null,
         );
     }
 

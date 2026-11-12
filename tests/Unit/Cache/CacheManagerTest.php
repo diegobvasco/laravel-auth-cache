@@ -20,49 +20,70 @@ it('implements cache interface', function () {
     expect($manager)->toBeInstanceOf(CacheInterface::class);
 });
 
-it('caches value when enabled', function () {
-    $config = CacheConfiguration::fromArray(['enabled' => true, 'ttl' => 60]);
-
+it('gets values from the repository', function () {
     $cacheMock = Mockery::mock(Repository::class);
-    $cacheMock->shouldReceive('remember')
+    $cacheMock->shouldReceive('get')
         ->once()
-        ->with('test.key', Mockery::type(DateTimeInterface::class), Mockery::type('callable'))
+        ->with('test.key')
         ->andReturn('cached-value');
 
     $manager = new CacheManager(
         $cacheMock,
-        $config
+        CacheConfiguration::fromArray(['enabled' => true, 'ttl' => 60])
     );
 
-    $result = $manager->remember('test.key', now()->addMinutes(60), fn () => 'original-value');
-
-    expect($result)->toBe('cached-value');
+    expect($manager->get('test.key'))->toBe('cached-value');
 });
 
-it('does not cache when disabled', function () {
-    $config = CacheConfiguration::fromArray(['enabled' => false, 'ttl' => 60]);
-
+it('puts values when enabled', function () {
     $cacheMock = Mockery::mock(Repository::class);
+    $cacheMock->shouldReceive('put')
+        ->once()
+        ->with('test.key', 'value', Mockery::type(DateTimeInterface::class))
+        ->andReturn(true);
 
     $manager = new CacheManager(
         $cacheMock,
-        $config
+        CacheConfiguration::fromArray(['enabled' => true, 'ttl' => 60])
     );
 
-    $result = $manager->remember('test.key', now()->addMinutes(60), fn () => 'original-value');
+    expect($manager->put('test.key', 'value', now()->addMinutes(60)))->toBeTrue();
+});
 
-    expect($result)->toBe('original-value');
+it('does not put values when disabled', function () {
+    $cacheMock = Mockery::mock(Repository::class);
+    $cacheMock->shouldNotReceive('put');
+
+    $manager = new CacheManager(
+        $cacheMock,
+        CacheConfiguration::fromArray(['enabled' => false, 'ttl' => 60])
+    );
+
+    expect($manager->put('test.key', 'value', now()->addMinutes(60)))->toBeFalse();
+});
+
+it('gets values through when disabled', function () {
+    $cacheMock = Mockery::mock(Repository::class);
+    $cacheMock->shouldReceive('get')
+        ->once()
+        ->with('test.key')
+        ->andReturn('cached-value');
+
+    $manager = new CacheManager(
+        $cacheMock,
+        CacheConfiguration::fromArray(['enabled' => false, 'ttl' => 60])
+    );
+
+    expect($manager->get('test.key'))->toBe('cached-value');
 });
 
 it('forgets cache value', function () {
-    $config = CacheConfiguration::fromArray(['enabled' => true, 'ttl' => 60]);
-
     $cacheMock = Mockery::mock(Repository::class);
     $cacheMock->shouldReceive('forget')->once()->with('test.key');
 
     $manager = new CacheManager(
         $cacheMock,
-        $config
+        CacheConfiguration::fromArray(['enabled' => true, 'ttl' => 60])
     );
 
     $manager->forget('test.key');

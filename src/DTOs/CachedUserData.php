@@ -4,84 +4,34 @@ declare(strict_types=1);
 
 namespace DiegoVasconcelos\AuthCache\DTOs;
 
+use DiegoVasconcelos\AuthCache\Cache\Exceptions\CorruptedCacheEntry;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
 
 readonly class CachedUserData
 {
-    public string $type;
-
     public ?string $modelClass;
 
     public ?array $attributes;
 
-    public ?string $value;
-
     public bool $exists;
 
     private function __construct(
-        string $type,
         ?string $modelClass,
         ?array $attributes,
-        ?string $value,
         bool $exists
     ) {
-        $this->type = $type;
         $this->modelClass = $modelClass;
         $this->attributes = $attributes;
-        $this->value = $value;
         $this->exists = $exists;
     }
 
     public static function fromModel(Model&Authenticatable $model): self
     {
         return new self(
-            type: 'model',
             modelClass: $model::class,
             attributes: $model->getAttributes(),
-            value: null,
             exists: $model->exists
-        );
-    }
-
-    public static function fromString(string $value): self
-    {
-        return new self(
-            type: 'string',
-            modelClass: null,
-            attributes: null,
-            value: $value,
-            exists: true
-        );
-    }
-
-    public static function fromNull(): self
-    {
-        return new self(
-            type: 'null',
-            modelClass: null,
-            attributes: null,
-            value: null,
-            exists: false
-        );
-    }
-
-    public static function from(mixed $value): self
-    {
-        if ($value === null) {
-            return self::fromNull();
-        }
-
-        if (is_string($value)) {
-            return self::fromString($value);
-        }
-
-        if ($value instanceof Model && $value instanceof Authenticatable) {
-            return self::fromModel($value);
-        }
-
-        throw new \InvalidArgumentException(
-            'Unsupported value type for caching. Expected Model, string, or null.'
         );
     }
 
@@ -94,12 +44,14 @@ readonly class CachedUserData
      */
     public static function fromArray(array $data): self
     {
+        if (! is_string($data['modelClass'] ?? null) || ! is_array($data['attributes'] ?? null)) {
+            throw new CorruptedCacheEntry('Cached user payload is missing or has invalid fields.');
+        }
+
         return new self(
-            type: $data['type'],
-            modelClass: $data['modelClass'] ?? null,
-            attributes: $data['attributes'] ?? null,
-            value: $data['value'] ?? null,
-            exists: $data['exists'] ?? false,
+            modelClass: $data['modelClass'],
+            attributes: $data['attributes'],
+            exists: (bool) ($data['exists'] ?? true),
         );
     }
 
@@ -109,30 +61,23 @@ readonly class CachedUserData
     public function toArray(): array
     {
         return [
-            'type' => $this->type,
             'modelClass' => $this->modelClass,
             'attributes' => $this->attributes,
-            'value' => $this->value,
             'exists' => $this->exists,
         ];
     }
 
-    public function toAuthenticatable(): string|(Model&Authenticatable)|null
+    public function toAuthenticatable(): Model&Authenticatable
     {
-        return match ($this->type) {
-            'null' => null,
-            'string' => $this->value,
-            'model' => $this->rehydrateModel(),
-            default => throw new \RuntimeException("Unknown cached data type: {$this->type}")
-        };
-    }
-
-    private function rehydrateModel(): Model&Authenticatable
-    {
-        if ($this->modelClass === null || $this->attributes === null) {
-            throw new \RuntimeException('Model data is incomplete for rehydration');
+        if (! class_exists($this->modelClass)
+            || ! is_subclass_of($this->modelClass, Model::class)
+            || ! is_a($this->modelClass, Authenticatable::class, true)) {
+            throw new CorruptedCacheEntry(
+                "Cached model class [{$this->modelClass}] does not exist or is not an Eloquent authenticatable model."
+            );
         }
 
+        /** @var Model&Authenticatable $model */
         $model = new $this->modelClass();
         $model->setRawAttributes($this->attributes, true);
         $model->exists = $this->exists;

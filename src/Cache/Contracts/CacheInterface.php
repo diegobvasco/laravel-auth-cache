@@ -6,7 +6,9 @@ namespace DiegoVasconcelos\AuthCache\Cache\Contracts;
 
 interface CacheInterface
 {
-    public function remember(string $key, int|\DateTimeInterface $ttl, callable $callback): mixed;
+    public function get(string $key): mixed;
+
+    public function put(string $key, mixed $value, \DateTimeInterface $expiresAt): bool;
 
     public function forget(string $key): void;
 }

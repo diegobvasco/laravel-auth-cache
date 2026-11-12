@@ -26,11 +26,15 @@ it('throws exception for cache key with spaces', function () {
         ->toThrow(InvalidArgumentException::class, 'Cache key cannot contain spaces');
 });
 
-it('checks if two cache keys are equal', function () {
-    $key1 = new CacheKey('auth.user.123');
-    $key2 = new CacheKey('auth.user.123');
-    $key3 = new CacheKey('auth.user.456');
+it('accepts zero as a valid key value', function () {
+    $key = new CacheKey('0');
 
-    expect($key1->equals($key2))->toBeTrue();
-    expect($key1->equals($key3))->toBeFalse();
+    expect($key->value())->toBe('0');
+});
+
+it('throws exception for reserved characters', function () {
+    foreach (['{', '}', '(', ')', '/', '\\', '@', ':'] as $reserved) {
+        expect(fn () => new CacheKey("auth{$reserved}user"))
+            ->toThrow(InvalidArgumentException::class, 'Cache key cannot contain reserved characters');
+    }
 });

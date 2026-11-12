@@ -76,8 +76,25 @@ it('throws when ttl exceeds the maximum', function () {
     CacheConfiguration::fromArray(['ttl' => 525601]);
 })->throws(InvalidArgumentException::class);
 
+it('falls back to the default ttl for non-numeric values', function () {
+    expect(CacheConfiguration::fromArray(['ttl' => 'abc'])->getTtl())->toBe(60);
+    expect(CacheConfiguration::fromArray(['ttl' => ''])->getTtl())->toBe(60);
+});
+
+it('does not validate the ttl when the cache is disabled', function () {
+    $config = CacheConfiguration::fromArray(['enabled' => false, 'ttl' => 0]);
+
+    expect($config->getTtl())->toBe(0);
+});
+
 it('accepts the default ttl without throwing', function () {
     $config = CacheConfiguration::fromArray([]);
 
     expect($config->getTtl())->toBe(60);
+});
+
+it('treats an empty store as the default store', function () {
+    $config = CacheConfiguration::fromArray(['store' => '']);
+
+    expect($config->getStore())->toBeNull();
 });

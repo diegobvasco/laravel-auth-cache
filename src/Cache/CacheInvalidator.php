@@ -15,9 +15,8 @@ readonly class CacheInvalidator implements CacheInvalidatorInterface
         private CacheKeyGeneratorInterface $keyGenerator
     ) {}
 
-    public function invalidate(object $model, mixed $identifier): void
+    public function invalidate(string $modelClass, mixed $identifier): void
     {
-        $key = $this->keyGenerator->generate(get_class($model), $identifier);
-        $this->cache->forget($key);
+        $this->cache->forget($this->keyGenerator->generate($modelClass, $identifier));
     }
 }

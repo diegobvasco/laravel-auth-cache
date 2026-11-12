@@ -6,5 +6,5 @@ namespace DiegoVasconcelos\AuthCache\Cache\Contracts;
 
 interface CacheInvalidatorInterface
 {
-    public function invalidate(object $model, mixed $identifier): void;
+    public function invalidate(string $modelClass, mixed $identifier): void;
 }

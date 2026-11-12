@@ -32,7 +32,7 @@ class FanOutCacheInvalidator implements CacheInvalidatorInterface
         private Closure $providerConfigurations,
     ) {}
 
-    public function invalidate(object $model, mixed $identifier): void
+    public function invalidate(string $modelClass, mixed $identifier): void
     {
         $configurations = $this->resolveConfigurations();
 
@@ -43,7 +43,7 @@ class FanOutCacheInvalidator implements CacheInvalidatorInterface
         foreach ($configurations as $configuration) {
             $keyGenerator = ($this->keyGeneratorResolver)($configuration);
 
-            $key = $keyGenerator->generate(get_class($model), $identifier);
+            $key = $keyGenerator->generate($modelClass, $identifier);
 
             $this->repositoryFor($configuration)->forget($key);
         }

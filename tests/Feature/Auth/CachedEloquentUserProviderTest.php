@@ -10,6 +10,7 @@ use DiegoVasconcelos\AuthCache\Tests\Fixtures\Models\User;
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\Repository;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 function makeProvider(
     array $config = ['enabled' => true, 'ttl' => 60, 'prefix' => 'auth'],
@@ -87,7 +88,9 @@ it('rehydrates model correctly from cached dto', function () {
     $cachedValue = Cache::get($cacheKey);
 
     expect($cachedValue)->toBeArray();
-    expect($cachedValue['type'])->toBe('model');
+    expect($cachedValue['modelClass'])->toBe(User::class);
+    expect($cachedValue['attributes'])->toBe($first->getAttributes());
+    expect($cachedValue['exists'])->toBeTrue();
 
     $second = $provider->retrieveById($user->id);
 
@@ -99,7 +102,7 @@ it('rehydrates model correctly from cached dto', function () {
     expect($second)->not->toBe($first);
 });
 
-it('handles null returns from provider', function () {
+it('does not cache misses', function () {
     [$provider, $cacheKeyGenerator] = makeProvider();
 
     $result = $provider->retrieveById(999999);
@@ -107,24 +110,80 @@ it('handles null returns from provider', function () {
     expect($result)->toBeNull();
 
     $cacheKey = $cacheKeyGenerator->generate(User::class, 999999);
-    $cachedValue = Cache::get($cacheKey);
 
-    expect($cachedValue)->toBeArray();
-    expect($cachedValue['type'])->toBe('null');
+    expect(Cache::has($cacheKey))->toBeFalse();
 });
 
-it('returns non-array cached value directly', function () {
+it('treats non-array cache entries as misses and re-caches from the database', function () {
     $user = User::factory()->create();
 
     [$provider, $cacheKeyGenerator] = makeProvider();
 
     $cacheKey = $cacheKeyGenerator->generate(User::class, $user->id);
 
-    Cache::put($cacheKey, 'plain-string-value');
+    Cache::put($cacheKey, 'plain-string-value', 60);
 
     $result = $provider->retrieveById($user->id);
 
-    expect($result)->toBe('plain-string-value');
+    expect($result)->toBeInstanceOf(User::class);
+    expect($result->getKey())->toBe($user->getKey());
+
+    expect(Cache::get($cacheKey))->toBeArray();
+});
+
+it('does not query the database when a valid cache entry exists', function () {
+    $user = User::factory()->create();
+
+    [$provider] = makeProvider();
+
+    $provider->retrieveById($user->id);
+
+    $queries = 0;
+    DB::listen(function () use (&$queries) {
+        $queries++;
+    });
+
+    $second = $provider->retrieveById($user->id);
+
+    expect($queries)->toBe(0);
+    expect($second->getKey())->toBe($user->getKey());
+});
+
+it('recovers from a corrupted cache entry pointing at a missing model class', function () {
+    $user = User::factory()->create();
+
+    [$provider, $cacheKeyGenerator] = makeProvider();
+
+    $cacheKey = $cacheKeyGenerator->generate(User::class, $user->id);
+
+    Cache::put($cacheKey, [
+        'modelClass' => 'App\\Gone\\User',
+        'attributes' => ['id' => $user->id],
+        'exists' => true,
+    ], 60);
+
+    $result = $provider->retrieveById($user->id);
+
+    expect($result)->toBeInstanceOf(User::class);
+    expect($result->getKey())->toBe($user->getKey());
+
+    expect(Cache::get($cacheKey)['modelClass'])->toBe(User::class);
+});
+
+it('replaces legacy payload entries with fresh data', function () {
+    $user = User::factory()->create();
+
+    [$provider, $cacheKeyGenerator] = makeProvider();
+
+    $cacheKey = $cacheKeyGenerator->generate(User::class, $user->id);
+
+    Cache::put($cacheKey, ['type' => 'null'], 60);
+
+    $result = $provider->retrieveById($user->id);
+
+    expect($result)->toBeInstanceOf(User::class);
+
+    expect(Cache::get($cacheKey)['modelClass'])->toBe(User::class);
 });
 
 it('works when the cache store restricts unserializable classes', function () {

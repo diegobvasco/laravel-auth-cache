@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use DiegoVasconcelos\AuthCache\Cache\Exceptions\CorruptedCacheEntry;
 use DiegoVasconcelos\AuthCache\DTOs\CachedUserData;
 use DiegoVasconcelos\AuthCache\Tests\Fixtures\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -16,109 +17,10 @@ it('creates dto from eloquent model', function () {
 
     $dto = CachedUserData::fromModel($user);
 
-    expect($dto->type)->toBe('model');
     expect($dto->modelClass)->toBe(User::class);
     expect($dto->attributes)->toBe($user->getAttributes());
     expect($dto->exists)->toBeTrue();
-    expect($dto->value)->toBeNull();
 });
-
-it('creates dto from string value', function () {
-    $token = 'api_token_12345';
-
-    $dto = CachedUserData::fromString($token);
-
-    expect($dto->type)->toBe('string');
-    expect($dto->value)->toBe($token);
-    expect($dto->modelClass)->toBeNull();
-    expect($dto->attributes)->toBeNull();
-    expect($dto->exists)->toBeTrue();
-});
-
-it('creates dto from null value', function () {
-    $dto = CachedUserData::fromNull();
-
-    expect($dto->type)->toBe('null');
-    expect($dto->value)->toBeNull();
-    expect($dto->modelClass)->toBeNull();
-    expect($dto->attributes)->toBeNull();
-    expect($dto->exists)->toBeFalse();
-});
-
-it('creates dto using from factory method with model', function () {
-    $user = User::factory()->create([
-        'name' => 'From Model User',
-        'email' => 'from-model@example.com',
-    ]);
-
-    $dto = CachedUserData::from($user);
-
-    expect($dto->type)->toBe('model');
-    expect($dto->modelClass)->toBe(User::class);
-    expect($dto->attributes)->toBe($user->getAttributes());
-    expect($dto->exists)->toBeTrue();
-    expect($dto->value)->toBeNull();
-});
-
-it('creates dto using from factory method with string', function () {
-    $token = 'test_token';
-
-    $dto = CachedUserData::from($token);
-
-    expect($dto->type)->toBe('string');
-    expect($dto->value)->toBe($token);
-    expect($dto->modelClass)->toBeNull();
-    expect($dto->attributes)->toBeNull();
-    expect($dto->exists)->toBeTrue();
-});
-
-it('creates dto using from factory method with null', function () {
-    $dto = CachedUserData::from(null);
-
-    expect($dto->type)->toBe('null');
-    expect($dto->value)->toBeNull();
-    expect($dto->modelClass)->toBeNull();
-    expect($dto->attributes)->toBeNull();
-    expect($dto->exists)->toBeFalse();
-});
-
-it('creates dto using from factory method with empty string', function () {
-    $dto = CachedUserData::from('');
-
-    expect($dto->type)->toBe('string');
-    expect($dto->value)->toBe('');
-    expect($dto->modelClass)->toBeNull();
-    expect($dto->attributes)->toBeNull();
-    expect($dto->exists)->toBeTrue();
-});
-
-it('throws exception when creating dto from array via from', function () {
-    CachedUserData::from(['array' => 'value']);
-})->throws(InvalidArgumentException::class);
-
-it('throws exception when creating dto from integer via from', function () {
-    CachedUserData::from(42);
-})->throws(InvalidArgumentException::class);
-
-it('throws exception when creating dto from float via from', function () {
-    CachedUserData::from(3.14);
-})->throws(InvalidArgumentException::class);
-
-it('throws exception when creating dto from boolean true via from', function () {
-    CachedUserData::from(true);
-})->throws(InvalidArgumentException::class);
-
-it('throws exception when creating dto from boolean false via from', function () {
-    CachedUserData::from(false);
-})->throws(InvalidArgumentException::class);
-
-it('throws exception when creating dto from plain object via from', function () {
-    CachedUserData::from(new stdClass());
-})->throws(InvalidArgumentException::class);
-
-it('throws exception with correct message via from', function () {
-    CachedUserData::from(123);
-})->throws(InvalidArgumentException::class, 'Unsupported value type for caching. Expected Model, string, or null.');
 
 it('rehydrates model from dto correctly', function () {
     $user = User::factory()->create([
@@ -149,22 +51,6 @@ it('rehydrates model preserves exists flag', function () {
     expect($rehydrated->exists)->toBeFalse();
 });
 
-it('returns string value from dto', function () {
-    $token = 'api_token_xyz';
-
-    $dto = CachedUserData::fromString($token);
-    $result = $dto->toAuthenticatable();
-
-    expect($result)->toBe($token);
-});
-
-it('returns null from dto', function () {
-    $dto = CachedUserData::fromNull();
-    $result = $dto->toAuthenticatable();
-
-    expect($result)->toBeNull();
-});
-
 it('preserves model attributes after roundtrip', function () {
     $user = User::factory()->create([
         'name' => 'Roundtrip User',
@@ -190,7 +76,6 @@ it('converts to a plain array of primitives', function () {
     $array = $dto->toArray();
 
     expect($array)->toBeArray();
-    expect($array['type'])->toBe('model');
     expect($array['modelClass'])->toBe(User::class);
     expect($array['attributes'])->toBe($user->getAttributes());
     expect($array['exists'])->toBeTrue();
@@ -228,34 +113,33 @@ it('survives a restricted unserialize roundtrip as array', function () {
     expect($rehydrated->getKey())->toBe($user->getKey());
 });
 
-it('throws exception when rehydrating model with incomplete data', function () {
-    $dto = CachedUserData::fromArray(['type' => 'model']);
+it('throws corrupted cache entry when the payload is missing fields', function () {
+    CachedUserData::fromArray([]);
+})->throws(CorruptedCacheEntry::class, 'Cached user payload is missing or has invalid fields.');
 
-    $dto->toAuthenticatable();
-})->throws(RuntimeException::class, 'Model data is incomplete for rehydration');
-
-it('throws exception when rehydrating model with null modelClass', function () {
-    $dto = CachedUserData::fromArray([
-        'type' => 'model',
-        'modelClass' => null,
+it('throws corrupted cache entry when the payload has invalid field types', function () {
+    CachedUserData::fromArray([
+        'modelClass' => 123,
         'attributes' => ['id' => 1],
     ]);
+})->throws(CorruptedCacheEntry::class);
 
-    $dto->toAuthenticatable();
-})->throws(RuntimeException::class, 'Model data is incomplete for rehydration');
-
-it('throws exception when rehydrating model with null attributes', function () {
+it('throws corrupted cache entry when the model class no longer exists', function () {
     $dto = CachedUserData::fromArray([
-        'type' => 'model',
-        'modelClass' => User::class,
-        'attributes' => null,
+        'modelClass' => 'App\\Gone\\User',
+        'attributes' => ['id' => 1],
+        'exists' => true,
     ]);
 
     $dto->toAuthenticatable();
-})->throws(RuntimeException::class, 'Model data is incomplete for rehydration');
+})->throws(CorruptedCacheEntry::class, 'does not exist or is not an Eloquent authenticatable model');
 
-it('throws exception when rehydrating with unknown type', function () {
-    $dto = CachedUserData::fromArray(['type' => 'unknown']);
+it('throws corrupted cache entry when the model class is not an Eloquent model', function () {
+    $dto = CachedUserData::fromArray([
+        'modelClass' => stdClass::class,
+        'attributes' => ['id' => 1],
+        'exists' => true,
+    ]);
 
     $dto->toAuthenticatable();
-})->throws(RuntimeException::class, 'Unknown cached data type: unknown');
+})->throws(CorruptedCacheEntry::class);

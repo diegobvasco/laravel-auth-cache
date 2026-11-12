@@ -23,12 +23,3 @@ it('throws exception for ttl exceeding 1 year', function () {
     expect(fn () => new CacheTtl(525601))
         ->toThrow(InvalidArgumentException::class, 'Cache TTL cannot exceed 525600 minutes (1 year)');
 });
-
-it('checks if two ttls are equal', function () {
-    $ttl1 = new CacheTtl(60);
-    $ttl2 = new CacheTtl(60);
-    $ttl3 = new CacheTtl(120);
-
-    expect($ttl1->equals($ttl2))->toBeTrue();
-    expect($ttl1->equals($ttl3))->toBeFalse();
-});

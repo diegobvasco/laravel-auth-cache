@@ -15,6 +15,6 @@ readonly class InvalidateCacheListener
 
     public function handle(CacheInvalidationRequested $event): void
     {
-        $this->cacheInvalidator->invalidate($event->model, $event->identifier);
+        $this->cacheInvalidator->invalidate(get_class($event->model), $event->identifier);
     }
 }
