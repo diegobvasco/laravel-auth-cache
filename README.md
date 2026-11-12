@@ -162,6 +162,15 @@ AUTH_CACHE_STORE=redis
 4. **Interface-Based Design**: All components use interfaces and dependency injection, making them testable and extensible.
 5. **Configurable**: You can enable/disable caching, adjust TTL, use different cache stores, and customize the cache key prefix.
 
+#### Cache keys and collisions
+
+Cache keys use the **model basename** (`{prefix}.{model_basename}.{id}`), so two distinct auth models sharing the same basename — for example `App\Models\Admin\User` and `App\Models\Client\User` — produce the same key (`auth.user.42`) and **will overwrite each other's cache entries**.
+
+If your application has more than one auth model with the same basename, either:
+
+- give each provider its own `prefix` (globally in `config/auth-cache.php`, or per-provider via the `cache.prefix` override in `config/auth.php`), **or**
+- provide a custom `CacheKeyGeneratorInterface` implementation that keys on the fully-qualified class name (see [Custom Cache Key Generator](#custom-cache-key-generator)).
+
 ## Architecture
 
 This package is built using SOLID principles and Laravel best practices:
