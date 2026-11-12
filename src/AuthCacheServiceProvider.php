@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace DiegoVasconcelos\AuthCache;
 
 use DiegoVasconcelos\AuthCache\Cache\CacheConfiguration;
-use DiegoVasconcelos\AuthCache\Cache\CacheInvalidator;
 use DiegoVasconcelos\AuthCache\Cache\CacheKeyGenerator;
 use DiegoVasconcelos\AuthCache\Cache\CacheManager;
 use DiegoVasconcelos\AuthCache\Cache\Contracts\CacheConfigurationInterface;
 use DiegoVasconcelos\AuthCache\Cache\Contracts\CacheInterface;
 use DiegoVasconcelos\AuthCache\Cache\Contracts\CacheInvalidatorInterface;
 use DiegoVasconcelos\AuthCache\Cache\Contracts\CacheKeyGeneratorInterface;
+use DiegoVasconcelos\AuthCache\Cache\FanOutCacheInvalidator;
+use DiegoVasconcelos\AuthCache\Cache\ProviderCacheRegistry;
 use DiegoVasconcelos\AuthCache\Events\CacheInvalidationRequested;
 use DiegoVasconcelos\AuthCache\Listeners\InvalidateCacheListener;
 use DiegoVasconcelos\AuthCache\Providers\CachedEloquentUserProviderRegistrar;
@@ -85,14 +86,15 @@ class AuthCacheServiceProvider extends ServiceProvider
 
     private function bindCacheInvalidator(): void
     {
-        $this->app->bind(CacheInvalidatorInterface::class, function ($app, array $params = []) {
-            $configuration = $params['configuration'] ?? $app->make(CacheConfigurationInterface::class);
-
-            return new CacheInvalidator(
-                cache: $params['cache'] ?? Cache::store(),
-                keyGenerator: $app->make(CacheKeyGeneratorInterface::class, [
-                    'configuration' => $configuration,
-                ]),
+        $this->app->bind(CacheInvalidatorInterface::class, function ($app) {
+            return new FanOutCacheInvalidator(
+                registry: $app->make(ProviderCacheRegistry::class),
+                fallbackConfiguration: CacheConfiguration::fromArray(config('auth-cache.cache', [])),
+                keyGeneratorResolver: fn (CacheConfigurationInterface $configuration) => $app->make(
+                    CacheKeyGeneratorInterface::class,
+                    ['configuration' => $configuration],
+                ),
+                providerConfigurations: fn (): array => CachedEloquentUserProviderRegistrar::configurationsFromAuthProviderConfig(),
             );
         });
     }
