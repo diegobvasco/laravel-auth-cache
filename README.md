@@ -35,6 +35,8 @@ return [
 ];
 ```
 
+Invalidation is aware of these overrides: when a model is updated or deleted, the package clears the cache entry on **every** store and prefix combination its `cachedEloquent` providers are configured to use — including processes (like queue workers) where the providers themselves were never resolved.
+
 ## Usage
 
 ### 1. Configure the Auth Provider
@@ -178,7 +180,7 @@ This package is built using SOLID principles and Laravel best practices:
 ### Interface-Based Design
 
 All cache operations are defined by interfaces:
-- **CacheInterface** - Core cache operations (remember, forget, isEnabled)
+- **CacheInterface** - Core cache operations (get, put, forget)
 - **CacheKeyGeneratorInterface** - Strategy for generating cache keys
 - **CacheInvalidatorInterface** - Handles cache invalidation
 - **CacheConfigurationInterface** - Configuration access
@@ -249,7 +251,7 @@ use DiegoVasconcelos\AuthCache\Cache\Contracts\CacheInvalidatorInterface;
 
 class CustomInvalidator implements CacheInvalidatorInterface
 {
-    public function invalidate(object $model, mixed $identifier): void
+    public function invalidate(string $modelClass, mixed $identifier): void
     {
         // Your custom logic (e.g. log, broadcast, etc.)
         Cache::forget("custom.key.{$identifier}");
@@ -273,6 +275,42 @@ app()->afterResolving(CacheConfigurationInterface::class, function ($config) {
     // Customize based on environment, user roles, etc.
 });
 ```
+
+### Custom Cache Store Wrapper
+
+Implement your own cache operations:
+
+```php
+use DiegoVasconcelos\AuthCache\Cache\Contracts\CacheInterface;
+
+class CustomCache implements CacheInterface
+{
+    public function get(string $key): mixed { /* ... */ }
+
+    public function put(string $key, mixed $value, \DateTimeInterface $expiresAt): bool { /* ... */ }
+
+    public function forget(string $key): void { /* ... */ }
+}
+
+app()->bind(CacheInterface::class, CustomCache::class);
+```
+
+## Upgrading from 2.x to 3.0
+
+**Behavior changes**
+
+- **Cache misses are no longer cached.** A lookup for a user that does not exist always hits the database instead of caching `null` for the full TTL.
+- **Corrupted or legacy cache entries are treated as misses.** Entries whose shape changed (e.g. 2.x `type: "null"` entries) are discarded and rebuilt from the database. Entries whose model class was renamed no longer fatal the request.
+- Non-array values found at a cache key are ignored and re-cached from the database.
+
+**API changes**
+
+- `CacheInterface` now exposes `get()`, `put()` and `forget()` instead of `remember()`. The TTL is always a `\DateTimeInterface` (integers were ambiguous: Laravel interprets them as seconds, while this package's config is in minutes).
+- `CacheInvalidatorInterface::invalidate()` takes `string $modelClass` instead of `object $model`.
+- `CachedUserData` only models successful lookups: `fromString()`, `fromNull()`, `from()` and the `type`/`value` payload fields were removed; `toAuthenticatable()` always returns a model or throws.
+- `CacheConfiguration` properties are no longer public; use the getters.
+- `CacheKey::equals()` and `CacheTtl::equals()` were removed.
+- An invalid `AUTH_CACHE_TTL` (empty or non-numeric) now falls back to `60` instead of throwing, and the TTL is not validated at all when caching is disabled.
 
 ## Testing
 
