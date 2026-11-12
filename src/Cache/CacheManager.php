@@ -15,13 +15,18 @@ class CacheManager implements CacheInterface
         private CacheConfigurationInterface $configuration,
     ) {}
 
-    public function remember(string $key, int|\DateTimeInterface $ttl, callable $callback): mixed
+    public function get(string $key): mixed
+    {
+        return $this->cache->get($key);
+    }
+
+    public function put(string $key, mixed $value, \DateTimeInterface $expiresAt): bool
     {
         if (! $this->configuration->isEnabled()) {
-            return $callback();
+            return false;
         }
 
-        return $this->cache->remember($key, $ttl, $callback);
+        return $this->cache->put($key, $value, $expiresAt);
     }
 
     public function forget(string $key): void

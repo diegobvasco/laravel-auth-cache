@@ -13,6 +13,7 @@ use DiegoVasconcelos\AuthCache\Cache\ProviderCacheRegistry;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Cache;
+use InvalidArgumentException;
 
 class CachedEloquentUserProviderRegistrar
 {
@@ -37,7 +38,7 @@ class CachedEloquentUserProviderRegistrar
 
         return new CachedEloquentUserProvider(
             hasher: $app['hash'],
-            model: $config['model'],
+            model: $config['model'] ?? throw new InvalidArgumentException('The [cachedEloquent] auth provider requires a [model] key.'),
             cache: $cacheManager,
             keyGenerator: $keyGenerator,
             configuration: $configuration,

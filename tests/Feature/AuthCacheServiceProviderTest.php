@@ -95,3 +95,11 @@ it('throws when an unknown cache store is configured', function () {
 
     Auth::createUserProvider('cached_eloquent');
 })->throws(InvalidArgumentException::class);
+
+it('throws when the provider config has no model', function () {
+    config()->set('auth.providers.no_model', [
+        'driver' => 'cachedEloquent',
+    ]);
+
+    Auth::createUserProvider('no_model');
+})->throws(InvalidArgumentException::class, 'The [cachedEloquent] auth provider requires a [model] key.');
