@@ -1,6 +1,6 @@
 {
     "name": "diegobvasco/laravel-auth-cache",
-    "description": "This is my package laravel-auth-cache",
+    "description": "Cached Eloquent user provider with event-driven invalidation for Laravel",
     "keywords": [
         "diegobvasco",
         "laravel",
@@ -33,14 +33,12 @@
     },
     "autoload": {
         "psr-4": {
-            "DiegoVasconcelos\\AuthCache\\": "src/",
-            "DiegoVasconcelos\\AuthCache\\Database\\Factories\\": "database/factories/"
+            "DiegoVasconcelos\\AuthCache\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "DiegoVasconcelos\\AuthCache\\Tests\\": "tests/",
-            "Workbench\\App\\": "workbench/app/"
+            "DiegoVasconcelos\\AuthCache\\Tests\\": "tests/"
         }
     },
     "scripts": {
