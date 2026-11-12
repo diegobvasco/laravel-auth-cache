@@ -2,6 +2,28 @@
 
 All notable changes to `laravel-auth-cache` will be documented in this file.
 
+## [3.0.0](https://github.com/diegobvasco/laravel-auth-cache/compare/v2.0.0...v3.0.0) (2026-11-12)
+
+
+### ⚠ BREAKING CHANGES
+
+* **cache:** CacheConfiguration public properties are now private;
+
+### Bug Fixes
+
+* **cache:** invalidate the configured store and per-guard cache settings ([ac1329e](https://github.com/diegobvasco/laravel-auth-cache/commit/ac1329e78dea2aa3dbd053cdf8180602969e5091))
+
+
+### Miscellaneous Chores
+
+* **deps:** bump actions/cache from 5.0.5 to 6.1.0 ([#19](https://github.com/diegobvasco/laravel-auth-cache/issues/19)) ([9cff373](https://github.com/diegobvasco/laravel-auth-cache/commit/9cff373b2a310451eefc9dd793595253e07590b2))
+* real package description and remove dead PSR-4 mappings ([76b107d](https://github.com/diegobvasco/laravel-auth-cache/commit/76b107d5dcf6ce4fc9ecc2dda7b21c2f0c560352))
+
+
+### Code Refactoring
+
+* **cache:** cache only hits and replace remember() with get()/put() ([2eb92de](https://github.com/diegobvasco/laravel-auth-cache/commit/2eb92ded3cb3c66383fb441badc325bb1b7d31d1))
+
 ## [2.0.0](https://github.com/diegobvasco/laravel-auth-cache/compare/1.1.0...v2.0.0) (2026-07-25)
 
 
