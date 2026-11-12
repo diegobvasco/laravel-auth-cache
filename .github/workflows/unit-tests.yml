@@ -64,6 +64,13 @@ jobs:
           composer config policy.advisories.block false
           composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
           composer update --${{ matrix.stability }} --prefer-dist --no-interaction
+          # prefer-lowest floors orchestra/testbench-core to a version whose
+          # HandleExceptions::flushState() call predates PHPUnit 12.3.4's
+          # ErrorHandler::enable(TestCase) signature change, so the framework
+          # reset between tests passes null and fatals. Realign testbench-core
+          # (which forwards the test case) while still testing the lowest
+          # framework/testbench pair itself.
+          composer update orchestra/testbench-core --with-all-dependencies --prefer-dist --no-interaction
 
       - name: List Installed Dependencies
         run: composer show -D
